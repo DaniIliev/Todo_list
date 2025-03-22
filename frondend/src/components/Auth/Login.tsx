@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { loginUser } from "../../services/userApi";
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -6,7 +7,7 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({username, password})
+    loginUser(username, password)
   }
   return (
     <div className='login container'>

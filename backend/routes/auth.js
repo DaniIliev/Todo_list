@@ -9,19 +9,31 @@ dotenv.config();
 const router = express.Router();
 
 router.post('/register', (req, res) => {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
 
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if(err) return res.status(500).json({message: 'Error hashing password'});
+    const checkQuery = 'SELECT * FROM users WHERE username = ?';
+    db.query(checkQuery, [username], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Error checking for existing user' });
+        if (results.length > 0) {
+            return res.status(400).json({ message: 'Username is already taken' });
+        }
 
-        const query = 'INSERT INTO users (username, password) VALUES(?, ?)';
-        db.query(query, [username, hashedPassword], (err, result) => {
-            if(err) return res.status(500).json({message: 'Error register user'});
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) return res.status(500).json({ message: 'Error hashing password' });
 
-            res.status(201).json({message: 'User registered successfully'})
-        })
-    })
-})
+            const query = 'INSERT INTO users (username, password) VALUES(?, ?)';
+            db.query(query, [username, hashedPassword], (err, result) => {
+                if (err) return res.status(500).json({ message: 'Error registering user' });
+
+                res.status(201).json({ message: 'User registered successfully' });
+            });
+        });
+    });
+});
 
 
 router.post('/login', (req,res) => {

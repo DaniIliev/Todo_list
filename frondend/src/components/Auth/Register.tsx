@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../../services/userApi';
+
 
 const Register = () => {
     const [username, setUsername] = useState("");
@@ -10,11 +12,12 @@ const Register = () => {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
   
-      console.log({ username, password });
+      registerUser(username, password)
   
       navigate("/dashboard");
     };
 
+    
   return (
         <div className="register container">
             <h2 className="register__title">Регистрация</h2>
