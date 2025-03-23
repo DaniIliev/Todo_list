@@ -1,11 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../types';
-
-interface UserContextType {  
-    user: User | null;  
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;  
-}  
-
+import { User, UserContextType } from '../types';
 
 const UserContext = createContext<UserContextType | null>(null);
 

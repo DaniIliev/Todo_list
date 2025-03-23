@@ -1,97 +1,100 @@
-import React, { useEffect, useState } from 'react'
-import { addTodo, deleteTodo, getTodos, toggleTodo } from '../../services/api';
+import React, { useContext, useEffect, useState } from 'react'
+// import { addTodo, deleteTodo, getTodos, toggleTodo } from '../../services/api';
+import { UserContext } from '../../context/UserContext';
+import CreateProject from '../CreateProject/CreateProject';
+import { Link } from 'react-router';
 
-interface Todo {
-    id: number;
-    text: string;
-    completed: boolean;
-}
+
+// interface Todo {
+//     id: number;
+//     text: string;
+//     completed: boolean;
+// }
 
 const Dashboard = () => {
-    const [todos, setTodos] = useState<Todo[]>([]);
-    const [newTodo, setNewTodo] = useState("");
+    const [projects, setProjects] = useState<any[]>([]);
 
+    const context = useContext(UserContext)
+
+    if (!context) {  
+        throw new Error("UserProfile must be used within a UserProvider");  
+    }  
+
+    const {user} = context
 
     useEffect(() => {
-        const fetchTodos = async () => {
-            try {
-                const fetchedTodos = await getTodos();
-                console.log('fs',fetchedTodos)
-                setTodos(fetchedTodos);
-            } catch (error) {
-                console.error("Грешка при зареждане на задачите", error);
+        const fetchProjects = async () => {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5500/api/projects', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            console.log(data)
+            if (response.ok) {
+                setProjects(data);
+            } else {
+                console.error('Failed to fetch projects:', data.message);
             }
-        }
+        };
 
-        fetchTodos()
-    }, [])
+        fetchProjects();
+    }, []);
 
-    const handleAddTodo = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if(newTodo.trim() !== ''){
-            try {
-                const addedTodo = await addTodo(newTodo);
-                setTodos((prevTodos) => [...prevTodos, addedTodo])
-                setNewTodo("")
-            } catch (error) {
-                console.error("Грешка при добавяне на задача", error);
-            }
-        }
-    }
+    // const handleAddTodo = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if(newTodo.trim() !== ''){
+    //         try {
+    //             const addedTodo = await addTodo(newTodo);
+    //             setTodos((prevTodos) => [...prevTodos, addedTodo])
+    //             setNewTodo("")
+    //         } catch (error) {
+    //             console.error("Грешка при добавяне на задача", error);
+    //         }
+    //     }
+    // }
 
-    const handleToggleCompleted = async (id: number, completed: boolean) => {
-        try {
-            const updatedTodo = await toggleTodo(id, !completed);
-            setTodos((prevTodos) =>
-              prevTodos.map((todo) =>
-                todo.id === id ? { ...todo, completed: !completed } : todo
-              )
-            );
-          } catch (error) {
-            console.error("Грешка при актуализирането на задачата", error);
-          }
-    }
-    const handleDeleteTodo = async (id:number) => {
-        try {
-            await deleteTodo(id)
-            setTodos((prevTodos) => prevTodos.filter((todo) => todo.id == id));
-        } catch (error) {
-            console.error("Грешка при изтриване на задачата", error);
-        }
-    }
+    // const handleToggleCompleted = async (id: number, completed: boolean) => {
+    //     try {
+    //         const updatedTodo = await toggleTodo(id, !completed);
+    //         setTodos((prevTodos) =>
+    //           prevTodos.map((todo) =>
+    //             todo.id === id ? { ...todo, completed: !completed } : todo
+    //           )
+    //         );
+    //       } catch (error) {
+    //         console.error("Грешка при актуализирането на задачата", error);
+    //       }
+    // }
+    // const handleDeleteTodo = async (id:number) => {
+    //     try {
+    //         await deleteTodo(id)
+    //         setTodos((prevTodos) => prevTodos.filter((todo) => todo.id == id));
+    //     } catch (error) {
+    //         console.error("Грешка при изтриване на задачата", error);
+    //     }
+    // }
+
   return (
     <div className="dashboard container">
-        <h2 className="dashboard__title">Моите задачи</h2>
-        <form className="form dashboard__form" onClick={handleAddTodo}>
-            <label htmlFor="new-todo" className="form__label">Нова задача</label>
-            <input 
-                type="text" 
-                className="form__input" 
-                id='new-todo' 
-                value={newTodo}
-                onChange={(e) => setNewTodo(e.target.value)}/>
+        <h1>Добре дошъл, {user?.username}</h1>
+        <h2 className="dashboard__title">Твоите проекти</h2>
 
-                <button className="btn dashboard__button" type='submit'>Добави</button>
-        </form>
+        <div>
+            <h2>Projects</h2>
+            <ul>
+                {projects.map((project) => (
+                    <li key={project.id}>
+                        <Link to={`/project/${project.id}`}>{project.name}</Link>
+                    </li>
+                ))}
+            </ul>
+        </div>
 
-        <ul className="dashboard__list">
-            {todos?.map((todo) =>(
-                <li>
-                    <span 
-                        className="dashboard__item-text"
-                        onClick={() => handleToggleCompleted(todo.id, todo.completed)}
-                        >
-                        {todo.text}
-                    </span>
-                    <button 
-                        className="btn dashboard__item-delete"
-                        onClick={() => handleDeleteTodo(todo.id)}
-                        >
-                        Изтрий
-                    </button>
-                </li>
-            ))}
-        </ul>
+        <CreateProject />
+        
     </div>
   )
 }
