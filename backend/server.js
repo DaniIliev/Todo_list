@@ -21,10 +21,6 @@ const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const tagRoutes = require('./routes/tags');
 
-// app.get('/api/todos', (req, res) => {
-//   res.send([dsaadf, dads, das]);
-// });
-
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);

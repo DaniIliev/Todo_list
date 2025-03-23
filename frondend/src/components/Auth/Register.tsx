@@ -13,8 +13,6 @@ const Register = () => {
       e.preventDefault();
   
       registerUser(username, password)
-  
-      navigate("/dashboard");
     };
 
     

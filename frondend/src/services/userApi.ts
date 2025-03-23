@@ -2,8 +2,13 @@ const API_URL = 'http://localhost:5500';
 
 interface AuthResponse  {
     token: string;
-  }
-  
+    username: string
+}
+interface User {
+    id: number;
+    username: string;
+}
+
 export const registerUser = async (username:String, password: String):Promise<AuthResponse | null> => {
 
     try {
@@ -19,7 +24,6 @@ export const registerUser = async (username:String, password: String):Promise<Au
         
         const data: AuthResponse = await response.json();
 
-        console.log(data)
         localStorage.setItem('token', data.token);
 
         return data;
@@ -29,7 +33,7 @@ export const registerUser = async (username:String, password: String):Promise<Au
     }
 }
 
-export const loginUser = async (username:String, password: String):Promise<AuthResponse | null> => {
+export const loginUser = async (username: String, password: String):Promise<AuthResponse | null> => {
 
     try {
         const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -44,7 +48,6 @@ export const loginUser = async (username:String, password: String):Promise<AuthR
         
         const data: AuthResponse = await response.json();
 
-        console.log(data)
         localStorage.setItem('token', data.token);
 
         return data;

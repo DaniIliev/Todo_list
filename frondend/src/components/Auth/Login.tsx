@@ -1,13 +1,18 @@
 import React, { useState } from "react"
 import { loginUser } from "../../services/userApi";
+import { useNavigate } from "react-router";
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate()
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginUser(username, password)
+    navigate(`/dashboard/${username}`)
+
   }
   return (
     <div className='login container'>

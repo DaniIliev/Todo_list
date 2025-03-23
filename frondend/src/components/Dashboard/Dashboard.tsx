@@ -11,6 +11,7 @@ const Dashboard = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [newTodo, setNewTodo] = useState("");
 
+
     useEffect(() => {
         const fetchTodos = async () => {
             try {

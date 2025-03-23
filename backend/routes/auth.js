@@ -3,10 +3,24 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const dotenv = require('dotenv');
-
+const {findOneByID} = require('../services/UserService');
+const authenticateToken = require('../utills/authenticateToken');
 dotenv.config();
 
 const router = express.Router();
+
+router.get('/me', authenticateToken, async (req, res) => {  
+    const userId = req.user.userId;
+
+    try {
+      const user = await findOneByID(userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching user data' });
+    } 
+});  
 
 router.post('/register', (req, res) => {
     const { username, password } = req.body;
@@ -51,7 +65,11 @@ router.post('/login', (req,res) => {
             if(!isMatch) return res.status(401).json({message: 'Invalid credentials'});
 
             const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.status(200).json({token})
+            const data = {
+                token: token,
+                username: user.username
+            }
+            res.status(200).json(data)
         })
     })
 })
