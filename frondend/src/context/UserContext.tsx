@@ -1,11 +1,13 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { User, UserContextType } from '../types';
+import { Project, User, UserContextType } from '../types';
+import * as projectService from '../services/projectService'
 
 const UserContext = createContext<UserContextType | null>(null);
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-
+    const [projects, setProjects] = useState<Project[] | null>(null);
+    
     useEffect(() => {  
       const fetchUser = async () => {  
         const token = localStorage.getItem("token");  
@@ -32,8 +34,13 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
       fetchUser();  
     }, []);
 
+    useEffect(() => {
+      projectService.fetchProjects()
+                    .then(data => setProjects(data))
+    }, [projects])
+
   return(  
-    <UserContext.Provider value={{ user, setUser }}>  
+    <UserContext.Provider value={{ user, setUser, projects}}>  
       {children}  
     </UserContext.Provider>  
   ); 

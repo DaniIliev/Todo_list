@@ -1,56 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import CreateTask from '../CreateTasks/CreateTasks';
-
+import * as tasksService from '../../services/tasksService'
+import { Task } from '../../types';
+import { UserContext } from '../../context/UserContext';
+import { Project } from '../../types';
 const ProjectDetails = () => {
-    const { projectId } = useParams();
+    const { projectId } = useParams<{ projectId: string }>();   
+    const project_id = projectId ? Number(projectId) : undefined; 
 
-    const [tasks, setTasks] = useState<any[]>([]);
-    const [tags] = useState(['frontend', 'backend']); // Статични тагове
+    const userContext = useContext(UserContext); 
+    if (!userContext) {  
+        throw new Error("UserProfile must be used within a UserProvider");  
+    } 
+
+    const {projects} = userContext; 
+
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [tags] = useState(['frontend', 'backend']); 
 
     useEffect(() => {
-        const fetchTasks = async () => {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5500/api/tasks/${projectId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+        if(project_id != undefined){
+            tasksService.fetchTasks(project_id)
+                        .then(data => setTasks(data));
+        }
 
-            const data = await response.json();
-            if (response.ok) {
-                setTasks(data);
-            } else {
-                console.error('Failed to fetch tasks:', data.message);
-            }
-        };
-
-        fetchTasks();
     }, [projectId]);
 
-    const handleTaskStatusChange = async (taskId: number, status: string) => {
-        const token = localStorage.getItem('token');  
-        const response = await fetch(`http://localhost:5500/api/tasks/${taskId}`, {  
-            method: 'PUT',  
-            headers: {  
-                'Content-Type': 'application/json',  
-                'Authorization': `Bearer ${token}`,  
-            },  
-            body: JSON.stringify({ status: status }),  
-        });  
-    
-        if (!response.ok) {  
-            const errorText = await response.text();   
-            console.error('Неуспешно обновяване на статуса на задачата:', errorText);  
-            return; 
-        }  
-    
-        const data = await response.json();  
-        setTasks((prevTasks) =>  
-            prevTasks.map((task) =>  
-                task.id === taskId ? { ...task, status: status } : task  
-            )  
-        );
+    const handleTaskStatusChange = async (taskId: number, status: 'Pending' | 'In Progress' | 'Done') => {
+        tasksService.taskStatusChange(taskId, status)
+                    .then(() => {
+                        setTasks((prevTasks) =>  
+                            prevTasks.map((task) =>  
+                                task.id === taskId ? { ...task, status: status } : task  
+                            )  
+                        );
+                    })
     };
 
     return (
@@ -58,10 +43,13 @@ const ProjectDetails = () => {
         
         <div className="project">  
                 {/* <h2 className="project__name">Project Details</h2>   */}
+                
                 <div className="project__list">
-                    <ul className="projects__list">
-                        <li>Лични задачи</li>
-                        <li>ToDo list app</li>
+                    <h2 className='project__list-title'>Your Projects</h2>
+                    <ul className="project__list-ul">
+                        {projects?.map((project: Project) => (
+                            <li className='project__list-item'>{project.name}</li>
+                        ))}
                     </ul>
                 </div>
                 <div className="project__tasks">  
@@ -70,7 +58,7 @@ const ProjectDetails = () => {
                         <div className="project__tasks-todo">  
                             <h3 className="project__tasks-section-title">Todo</h3>  
                             <ul className="project__tasks-list">  
-                                {tasks.filter(task => !task.completed && task.status === 'Pending').map(task => (  
+                                {tasks.filter(task => task.status === 'Pending').map(task => (  
                                     <li key={task.id} className="project__tasks-item">  
                                         <span className="project__tasks-title">{task.title} - Pending</span>  
                                         <button className="btn project__tasks__button orange" onClick={() => handleTaskStatusChange(task.id, 'In Progress')}>  
@@ -89,7 +77,7 @@ const ProjectDetails = () => {
                         <div className="project__tasks-doing">  
                             <h3 className="project__tasks-section-title">In Progress</h3>  
                             <ul className="project__tasks-list">  
-                                {tasks.filter(task => !task.completed && task.status === 'In Progress').map(task => (  
+                                {tasks.filter(task => task.status === 'In Progress').map(task => (  
                                     <li key={task.id} className="project__tasks-item">  
                                         <span className="project__tasks-title">{task.title} - In Progress</span>  
                                         <button className="btn project__tasks__button green" onClick={() => handleTaskStatusChange(task.id, 'Done')}>  
@@ -108,7 +96,7 @@ const ProjectDetails = () => {
                         <div className="project__tasks-done">  
                             <h3 className="project__tasks-section-title">Done</h3>  
                             <ul className="project__tasks-list">  
-                                {tasks.filter(task => task.completed || task.status === 'Done').map(task => (  
+                                {tasks.filter(task => task.status === 'Done').map(task => (  
                                     <li key={task.id} className="project__tasks-item">  
                                         <span className="project__tasks-title">{task.title} - Done</span>  
                                         <div className="project__tasks-tags">  

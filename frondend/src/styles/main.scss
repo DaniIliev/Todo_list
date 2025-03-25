@@ -1,19 +1,14 @@
-@import './_buttons.scss';
-@import './_forms.scss';
-@import './_layout.scss';
-@import './_reset.scss';
-@import './_variables.scss';
+@use './_buttons';  
+@use './_forms';  
+@use './_layout';  
+@use './_reset';  
+@use './_variables';  
 
-@import '../components/Auth/Login.scss';
-@import '../components/Auth/Reegister.scss';
+@use '../components/Auth/Register';  
+@use '../components/Auth/Login';  
 
-@import '../components/CreateProject/CreateProject.scss';
-
-@import '../components/CreateTasks/CreateTasks.scss';
-
-@import '../components/Dashboard/Dashboard.scss';
-
-@import '../components/ProjectDetails/ProjectDetails.scss';
-
-
+@use '../components/CreateProject/CreateProject.scss';
+@use '../components/CreateTasks/CreateTasks.scss';
+@use '../components/Dashboard/Dashboard.scss';
+@use '../components/ProjectDetails/ProjectDetails.scss'
 

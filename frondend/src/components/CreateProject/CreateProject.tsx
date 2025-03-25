@@ -18,6 +18,7 @@ const CreateProject = () => {
 
         const data = await response.json();
         if (response.ok) {
+            setProjectName('')
             console.log('Проектът е създаден успешно!', data);
         } else {
             console.log('Грешка при създаването на проект:', data.message);
@@ -28,6 +29,7 @@ const CreateProject = () => {
         <form onSubmit={handleSubmit} className='form project__form'>
             <label className='form__label'>Project Name</label>
             <input
+                placeholder='Enter your project name...'
                 className='form__input'
                 type="text"
                 value={projectName}
