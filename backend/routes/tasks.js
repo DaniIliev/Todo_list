@@ -40,4 +40,17 @@ router.put('/:id', (req, res) => {
     });  
 });  
 
+router.delete('/:id', (req, res) => {  
+    const taskId = req.params.id;  
+    db.query('DELETE FROM tasks WHERE id = ?', [taskId], (error, results) => {  
+        if (error) {  
+            return res.status(500).json({ error: "Database error" });  
+        }  
+        if (results.affectedRows === 0) {  
+            return res.status(404).json({ message: "Task not found" });  
+        }  
+        res.status(200).json({ message: "Task deleted successfully" });  
+    });  
+});  
+
 module.exports = router;

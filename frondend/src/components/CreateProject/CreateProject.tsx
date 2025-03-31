@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CreateProjectProps } from '../../types';
 
-const CreateProject = () => {
+const CreateProject: React.FC<CreateProjectProps> = ({showAddProjectModal, setShowAddProjectModal}) => {
     const [projectName, setProjectName] = useState('');
 
+     const modalRef = useRef<HTMLDivElement>(null);  
+    
+        useEffect(() => {  
+          const handleClickOutside = (event: MouseEvent) => {  
+            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {  
+                setShowAddProjectModal(false);
+              }    
+          };  
+      
+          if (showAddProjectModal) {  
+            document.addEventListener('mousedown', handleClickOutside);  
+          } else {  
+            document.removeEventListener('mousedown', handleClickOutside);  
+          }  
+      
+          return () => {  
+            document.removeEventListener('mousedown', handleClickOutside);  
+          };  
+        }, [showAddProjectModal]);  
+      
+        if (!showAddProjectModal) return null;
+     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -25,9 +48,13 @@ const CreateProject = () => {
         }
     };
 
+    
+
     return (
+        <div className="addTask" ref={modalRef}>
         <form onSubmit={handleSubmit} className='form project__form'>
-            <label className='form__label'>Project Name</label>
+            <label className='form__label'>Create Project
+            </label>
             <input
                 placeholder='Enter your project name...'
                 className='form__input'
@@ -38,6 +65,7 @@ const CreateProject = () => {
             />
             <button type="submit" className='btn project__button'>Create Project</button>
         </form>
+        </div>
     );
 };
 

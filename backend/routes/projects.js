@@ -5,7 +5,6 @@ const authenticateToken = require('../utills/authenticateToken');
 
 router.get('/', authenticateToken, (req, res) => {
     const userId = req.user.userId;
-    console.log(userId)
     const query = 'SELECT * FROM projects WHERE user_id = ?';
     db.query(query, [userId], (err, results) => {
         if (err) return res.status(500).json({ message: 'Error fetching projects' });

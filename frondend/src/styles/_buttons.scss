@@ -11,7 +11,9 @@
         border-radius: 10rem;
         transition: all .3s;
         position: relative;
-    }
+        width: 40%;
+        margin: 1rem auto;
+        }
     
     &:hover{
         transform: translateY(-0.3rem);

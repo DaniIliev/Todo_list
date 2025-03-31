@@ -25,3 +25,18 @@ export interface Task {
   project_id: number;  
   created_at: Date; 
 }  
+
+export interface SideNavProps {  
+  projects: Project[] | null;  
+}  
+
+
+export interface CreateTaskProps {  
+  setShowAddTaskModal: (show: boolean) => void;  
+  showAddTaskModal: boolean;
+}  
+
+export interface CreateProjectProps {  
+  setShowAddProjectModal: (show: boolean) => void;  
+  showAddProjectModal: boolean;
+}  

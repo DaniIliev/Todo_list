@@ -11,7 +11,7 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginUser(username, password)
-    navigate(`/dashboard/${username}`)
+    navigate(`/dashboard`)
 
   }
   return (

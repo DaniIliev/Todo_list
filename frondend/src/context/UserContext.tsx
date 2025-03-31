@@ -37,7 +37,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
       projectService.fetchProjects()
                     .then(data => setProjects(data))
-    }, [projects])
+    }, [])
 
   return(  
     <UserContext.Provider value={{ user, setUser, projects}}>  
